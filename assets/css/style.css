@@ -67,6 +67,31 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* ---------- Site-wide background render ---------- */
+.site-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.site-bg img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  opacity: 0.34;
+}
+.site-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0.55) 38%, var(--surface) 88%);
+}
+
 /* Prevent horizontal scroll bleed on any wide child */
 main, section, header, footer { max-width: 100%; }
 

@@ -218,16 +218,55 @@
     const lines = $$('.hero-title .line-mask > span');
     gsap.set('.hero-title', { opacity: 1 });
     gsap.set(lines, { yPercent: 115 });
-    tl.from('.hero-badge', { y: 20, opacity: 0, duration: 0.7 })
-      .to(lines, { yPercent: 0, duration: 1.1, stagger: 0.12 }, '-=0.35')
-      .from('.hero-sub', { y: 24, opacity: 0, duration: 0.8 }, '-=0.6')
-      .from('.hero-desc', { y: 24, opacity: 0, duration: 0.8 }, '-=0.65')
-      .from('.hero-actions > *', { y: 24, opacity: 0, duration: 0.7, stagger: 0.1 }, '-=0.6')
-      .from('.hero-stat, .hero-stat-div', { y: 20, opacity: 0, duration: 0.6, stagger: 0.08 }, '-=0.5')
-      .from('.hero-visual .avatar-frame, .hero-visual .media-frame', { clipPath: 'inset(100% 0% 0% 0%)', duration: 1.1, ease: 'power4.inOut' }, '-=1.2')
-      .from('.hero-visual .avatar-ring, .hero-visual .media-ring', { scale: 0.8, opacity: 0, duration: 0.9 }, '-=0.7')
-      .from('.avatar-badge', { scale: 0.6, opacity: 0, duration: 0.6, stagger: 0.12, ease: 'back.out(1.7)' }, '-=0.5')
-      .from('.hero-scroll', { opacity: 0, duration: 0.6 }, '-=0.3');
+    // clearProps on the tiles: GSAP leaves an inline transform behind, which
+    // would permanently override the CSS :hover scale on .hero-tile.
+    tl.from('.hero-visual .mascot-figure', { y: 60, opacity: 0, duration: 1 })
+      .from('.hero-tile', { y: 34, opacity: 0, duration: 0.7, stagger: 0.09, clearProps: 'transform,opacity' }, '-=0.55')
+      .from('.hero-badge', { y: 20, opacity: 0, duration: 0.6 }, '-=0.4')
+      .to(lines, { yPercent: 0, duration: 1, stagger: 0.1 }, '-=0.35')
+      .from('.hero-sub', { y: 22, opacity: 0, duration: 0.7 }, '-=0.5')
+      .from('.hero-stat, .hero-stat-div', { y: 18, opacity: 0, duration: 0.55, stagger: 0.07 }, '-=0.45')
+      .from('.hero-scroll', { opacity: 0, duration: 0.6 }, '-=0.2');
+  }
+
+  /* ============================================================
+     MASCOT — head tracks the cursor
+     ============================================================ */
+  function initMascotHead() {
+    const stage = $('[data-mascot-stage]');
+    const head = $('[data-mascot-head]');
+    if (!stage || !head) return;
+
+    if (prefersReduced) return; // keep the head static for reduced-motion users
+
+    const MAX_DEG = 14;       // clamp so the head never looks unnatural
+    const EASE = 0.12;        // lerp factor — lower = smoother/lazier follow
+    let targetX = 0, targetY = 0;   // -1..1 offset from stage center
+    let curX = 0, curY = 0;
+    let raf = null;
+
+    const pointerFromEvent = (clientX, clientY) => {
+      const r = stage.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height * 0.32; // aim roughly at the head's on-screen center, not the whole stage
+      const dx = (clientX - cx) / (r.width / 2);
+      const dy = (clientY - cy) / (r.height / 2);
+      targetX = Math.max(-1, Math.min(1, dx));
+      targetY = Math.max(-1, Math.min(1, dy));
+    };
+
+    const tick = () => {
+      curX += (targetX - curX) * EASE;
+      curY += (targetY - curY) * EASE;
+      const rotY = curX * MAX_DEG;        // left/right cursor movement -> turn head Y axis
+      const rotX = -curY * (MAX_DEG * 0.6); // up/down cursor movement -> tilt head X axis (less range)
+      head.style.transform = `rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg)`;
+      raf = requestAnimationFrame(tick);
+    };
+
+    window.addEventListener('mousemove', (e) => pointerFromEvent(e.clientX, e.clientY), { passive: true });
+    window.addEventListener('mouseleave', () => { targetX = 0; targetY = 0; });
+    raf = requestAnimationFrame(tick);
   }
 
   /* ============================================================
@@ -293,6 +332,7 @@
     initSCurves();
     initReveals();
     initHeroIntro();
+    initMascotHead();
     initMarquee();
     initMagnetic();
     initCursor();
