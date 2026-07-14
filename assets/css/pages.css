@@ -34,16 +34,25 @@
 .hero-tile {
   position: relative;
   display: block;
-  width: clamp(148px, 13.5vw, 196px);
-  aspect-ratio: 1 / 1;
-  border-radius: 22px;
+  width: clamp(112px, 9.5vw, 152px);
+  aspect-ratio: 3 / 4;
+  border-radius: 18px;
   background: var(--surface);
   border: 1px solid var(--line);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
   z-index: 1;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(20px);
   transition: transform .5s var(--ease), box-shadow .5s var(--ease), border-color .4s var(--ease);
   will-change: transform;
+}
+.hero-tile.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
 }
 /* rotating beam, revealed as a thin rim around .tile-in on hover */
 .hero-tile::before {
@@ -68,9 +77,9 @@
   animation: tileBeam 3.4s linear infinite;
 }
 @keyframes tileBeam { to { transform: translate(-50%, -50%) rotate(360deg); } }
-.hero-tile:hover,
-.hero-tile:focus-visible {
-  transform: translateY(-8px) scale(1.35);
+.hero-tile.is-visible:hover,
+.hero-tile.is-visible:focus-visible {
+  transform: translateY(-6px) scale(1.2);
   z-index: 7;
   box-shadow: var(--shadow-lg);
   border-color: transparent;
@@ -173,44 +182,47 @@
 .hero-stat-div { width: 1px; height: 46px; background: var(--line); }
 
 /* ============================================================
-   HERO MASCOT — full scene card; head tracks the cursor
+   HERO MASCOT — scroll-scrubbed canvas sequence over a static lab backdrop
    ============================================================ */
-.hero-visual {
+.hero-visual--canvas {
   position: relative;
   justify-self: center;
-  width: clamp(280px, 27vw, 420px);
-  aspect-ratio: 1150 / 1600;
-  container-type: inline-size;
-}
-/* Both layers size off the same container-query unit (cqw), computed once from
-   .hero-visual's width — this keeps the head and body locked to identical pixel
-   math at every viewport size (per-image auto-sizing rounded the two layers to
-   different pixel heights and opened a hairline gap at the neck).
-   `perspective` lives here (not on .hero-visual) because `container-type` on an
-   ancestor establishes containment that blocks perspective from being inherited
-   by descendants — it has no visible effect from further up the tree. */
-.mascot-figure {
-  position: absolute;
-  inset: 0;
+  width: min(88vw, 1180px);
+  height: 68svh;
+  max-height: 760px;
+  aspect-ratio: 16 / 9;
   border-radius: 26px;
   overflow: hidden;
-  background: #F4F6F8; /* matches the artwork's studio backdrop */
   box-shadow: var(--shadow-lg);
-  perspective: 900px;
 }
-.mascot-figure img {
+.lab-bg-img {
   position: absolute;
-  top: 0; left: 0;
-  width: 100cqw;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity .4s linear;
   user-select: none;
   -webkit-user-drag: none;
 }
-.mascot-body { z-index: 1; height: 139.1304cqw; /* 1600/1150 */ }
-.mascot-head {
-  z-index: 2;
-  height: 57.3913cqw; /* 660/1150 */
-  transform-origin: 50% 88%;
-  will-change: transform;
+.hero-visual--canvas canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ============================================================
+   LAB-SECTION — tall scroll-scrub runway; .hero is pinned over it
+   ============================================================ */
+#lab-section {
+  position: relative;
+  height: 500vh;
+}
+@media (max-width: 860px) {
+  #lab-section { height: 320vh; }
 }
 
 .hero-scroll {
@@ -696,10 +708,10 @@
 }
 @media (max-width: 860px) {
   .hero-grid-3 { grid-template-columns: 1fr; gap: 28px; }
-  .hero-visual { order: -1; justify-self: center; width: clamp(250px, 66vw, 340px); }
+  .hero-visual--canvas { order: -1; justify-self: center; width: 94vw; height: auto; max-height: none; }
   .hero-tiles { flex-direction: row; justify-content: center; }
   .hero-tiles--left, .hero-tiles--right { align-items: center; }
-  .hero-tile { width: clamp(136px, 40vw, 170px); }
+  .hero-tile { width: clamp(104px, 30vw, 130px); }
   .hero-scroll { display: none; }
   .about-grid { grid-template-columns: 1fr; gap: 60px; }
   .about-media { max-width: 420px; }
