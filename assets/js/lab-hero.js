@@ -39,11 +39,28 @@
     canvas.height = Math.max(1, Math.round(rect.height * dpr));
   }
 
+  // The source frames are 1920x1080 with the character occupying only the
+  // left-center ~40% of the canvas (lots of empty margin for the original
+  // video composition). CHAR_CENTER_X/Y pinpoint the character's on-screen
+  // center across the sequence so zooming enlarges it without cropping any
+  // pose (standing, crouching, etc.) out of frame.
+  const CHAR_CENTER_X = 0.46;
+  const CHAR_CENTER_Y = 0.52;
+  const CHAR_ZOOM = 1.6;
+
   function drawFrame(index) {
     const img = frames[Math.max(0, Math.min(TOTAL - 1, index))];
     if (!img || !img.complete || !img.naturalWidth) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    // Draw contain-fit + centered on the character (not stretched, not
+    // centered on the empty canvas) so the mascot reads large and centered.
+    const scale = Math.min(canvas.width / img.naturalWidth, canvas.height / img.naturalHeight) * CHAR_ZOOM;
+    const drawW = img.naturalWidth * scale;
+    const drawH = img.naturalHeight * scale;
+    const dx = canvas.width / 2 - img.naturalWidth * CHAR_CENTER_X * scale;
+    const dy = canvas.height / 2 - img.naturalHeight * CHAR_CENTER_Y * scale;
+    ctx.drawImage(img, dx, dy, drawW, drawH);
   }
 
   function preloadFrames(onDone) {
@@ -92,14 +109,22 @@
     }
   }
 
+  // The title/stats block stays hidden while the mascot is still falling
+  // into place, then rises up and fades in underneath it once the
+  // character has settled into its final pose (last 20% of the scrub).
+  const HERO_BOTTOM_REVEAL_START = 0.8;
+
   function updateHeroBottomFade(progress) {
     if (!heroBottom) return;
-    const t = Math.max(0, Math.min(1, progress / 0.15));
-    heroBottom.style.opacity = String(1 - t);
+    const t = Math.max(0, Math.min(1, (progress - HERO_BOTTOM_REVEAL_START) / (1 - HERO_BOTTOM_REVEAL_START)));
+    heroBottom.style.opacity = String(t);
+    heroBottom.style.transform = `translateY(${(1 - t) * 28}px)`;
   }
 
   function initNoScrollTriggerFallback() {
-    // No GSAP/ScrollTrigger available at all — draw the final pose statically.
+    // No GSAP/ScrollTrigger available (e.g. CDN blocked, offline, opened via
+    // file://) — draw the final pose statically. Tiles/text are unaffected:
+    // they default to fully visible since .hero-anim-ready never gets added.
     section.style.height = 'auto';
     resizeCanvas();
     const finalImg = new Image();
@@ -109,8 +134,6 @@
     };
     finalImg.src = FRAME_PATH(TOTAL);
     labBg.style.opacity = '1';
-    tiles.forEach((tile) => tile.classList.add('is-visible'));
-    if (heroBottom) heroBottom.style.opacity = '1';
   }
 
   function initScrub() {
@@ -119,21 +142,32 @@
       return;
     }
 
-    ScrollTrigger.create({
+    // Only now gate tiles/hero-bottom behind scroll-reveal — from this point
+    // on onUpdate is guaranteed to run and take over their visibility.
+    document.documentElement.classList.add('hero-anim-ready');
+
+    const onScrubUpdate = (self) => {
+      const frameIndex = Math.round(self.progress * (TOTAL - 1));
+      drawFrame(frameIndex);
+      updateLabBgVisibility(frameIndex);
+      updateShakeState(self.progress);
+      updateTilesReveal(self.progress);
+      updateHeroBottomFade(self.progress);
+    };
+
+    const trigger = ScrollTrigger.create({
       trigger: section,
       start: 'top top',
       end: 'bottom bottom',
       pin: '.hero',
       scrub: 0.4,
-      onUpdate: (self) => {
-        const frameIndex = Math.round(self.progress * (TOTAL - 1));
-        drawFrame(frameIndex);
-        updateLabBgVisibility(frameIndex);
-        updateShakeState(self.progress);
-        updateTilesReveal(self.progress);
-        updateHeroBottomFade(self.progress);
-      }
+      onUpdate: onScrubUpdate
     });
+
+    // Force one synchronous pass at the current scroll position — ScrollTrigger
+    // doesn't always fire onUpdate on creation, and without this tiles/text
+    // stay stuck in their initial hidden state until the user scrolls.
+    onScrubUpdate(trigger);
 
     let resizeTimer = null;
     window.addEventListener('resize', () => {

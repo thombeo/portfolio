@@ -42,12 +42,17 @@
   box-shadow: var(--shadow-sm);
   overflow: hidden;
   z-index: 1;
+  transition: transform .5s var(--ease), box-shadow .5s var(--ease), border-color .4s var(--ease);
+  will-change: transform;
+}
+/* Tiles/text default to fully visible (no-JS / JS-failed state). Only once
+   lab-hero.js confirms it booted does .hero-anim-ready gate them behind
+   scroll-reveal — this way a broken CDN script never hides page content. */
+.hero-anim-ready .hero-tile {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
   transform: translateY(20px);
-  transition: transform .5s var(--ease), box-shadow .5s var(--ease), border-color .4s var(--ease);
-  will-change: transform;
 }
 .hero-tile.is-visible {
   opacity: 1;
@@ -120,6 +125,10 @@
   position: relative;
   z-index: 3;
 }
+.hero-anim-ready .hero-bottom {
+  opacity: 0;
+  transform: translateY(28px);
+}
 .hero-bottom .hero-badge { margin-bottom: 22px; }
 .hero-bottom .hero-title { font-size: clamp(2rem, 4.4vw, 3.6rem); margin-bottom: 16px; }
 .hero-bottom .hero-sub { margin: 0 auto 26px; }
@@ -187,7 +196,7 @@
 .hero-visual--canvas {
   position: relative;
   justify-self: center;
-  width: min(88vw, 1180px);
+  width: min(46vw, 620px);
   height: 68svh;
   max-height: 760px;
   aspect-ratio: 16 / 9;
