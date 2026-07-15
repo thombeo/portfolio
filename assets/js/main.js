@@ -214,16 +214,17 @@
   function initHeroIntro() {
     const hero = $('[data-hero]');
     if (!hero || !hasGSAP || prefersReduced) return;
-    const tl = gsap.timeline({ delay: 0.85, defaults: { ease: 'power4.out' } });
+    const tl = gsap.timeline({ delay: 0.7, defaults: { ease: 'power4.out' } });
     const lines = $$('.hero-title .line-mask > span');
     gsap.set('.hero-title', { opacity: 1 });
     gsap.set(lines, { yPercent: 115 });
-    tl.from('.hero-visual--canvas', { y: 60, opacity: 0, duration: 1 })
-      .from('.hero-badge', { y: 20, opacity: 0, duration: 0.6 }, '-=0.55')
-      .to(lines, { yPercent: 0, duration: 1, stagger: 0.1 }, '-=0.35')
-      .from('.hero-sub', { y: 22, opacity: 0, duration: 0.7 }, '-=0.5')
-      .from('.hero-stat, .hero-stat-div', { y: 18, opacity: 0, duration: 0.55, stagger: 0.07 }, '-=0.45')
+    tl.from('[data-hero-badge]', { y: 20, opacity: 0, duration: 0.6 })
+      .to(lines, { yPercent: 0, duration: 1, stagger: 0.1 }, '-=0.2')
+      .from('[data-hero-cta] > *', { y: 22, opacity: 0, duration: 0.6, stagger: 0.08 }, '-=0.5')
+      .from('[data-hero-stats] .hero-stat, [data-hero-stats] .hero-stat-div', { y: 18, opacity: 0, duration: 0.55, stagger: 0.07 }, '-=0.4')
       .from('.hero-scroll', { opacity: 0, duration: 0.6 }, '-=0.2');
+    // Note: [data-illuminate] lead + [data-reveal] tiles are handled by
+    // home.js / initReveals so they aren't double-driven here.
   }
 
   /* ============================================================

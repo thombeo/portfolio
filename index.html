@@ -34,7 +34,7 @@
       <a href="about.html" data-transition>Giới Thiệu</a>
       <a href="work.html" data-transition>Dự Án</a>
       <a href="contact.html" data-transition>Liên Hệ</a>
-      <a class="nav-cta" href="contact.html" data-transition>Hợp Tác</a>
+      <a class="nav-cta" href="contact.html" data-transition data-magnetic>Hợp Tác</a>
     </nav>
     <button class="nav-toggle" aria-label="Mở menu"><span></span><span></span><span></span></button>
   </div>
@@ -43,65 +43,35 @@
 <main>
 
 <!-- ===================== HERO ===================== -->
-<section class="hero" data-hero>
+<section class="hero hero--text" data-hero>
   <svg class="scurve" viewBox="0 0 1440 900" preserveAspectRatio="none">
     <path class="curve-soft" d="M-100,650 C300,720 420,300 720,360 C1020,420 1140,760 1560,620"/>
     <path d="M-100,520 C250,560 500,180 760,260 C1080,360 1180,640 1560,500"/>
   </svg>
-  <span class="shape shape-ring" style="width:120px;height:120px;top:18%;right:8%;" data-parallax="0.25"></span>
-  <span class="shape shape-dot" style="width:14px;height:14px;top:70%;right:22%;" data-parallax="0.5"></span>
-  <span class="blob blob-accent" style="width:420px;height:420px;top:-80px;right:-60px;"></span>
+  <span class="shape shape-ring" style="width:120px;height:120px;top:16%;right:9%;" data-parallax="0.25"></span>
+  <span class="shape shape-dot" style="width:14px;height:14px;top:68%;right:20%;" data-parallax="0.5"></span>
+  <span class="shape shape-ring" style="width:70px;height:70px;top:74%;left:8%;" data-parallax="0.4"></span>
+  <span class="blob blob-accent" style="width:460px;height:460px;top:-90px;right:-70px;"></span>
+  <span class="blob blob-accent" style="width:360px;height:360px;bottom:-120px;left:-80px;"></span>
 
   <div class="container">
-    <div class="hero-grid-3">
-      <div class="hero-tiles hero-tiles--left" data-hero-tiles>
-        <a class="hero-tile" href="about.html" data-transition>
-          <span class="tile-in">
-            <span class="tile-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7.5" r="4"/><path d="M4.5 21c.6-4 3.6-6 7.5-6s6.9 2 7.5 6"/></svg></span>
-            <span class="tile-name">Thông Tin</span>
-            <span class="tile-desc">Hồ sơ &amp; kinh nghiệm</span>
-          </span>
-        </a>
-        <a class="hero-tile" href="work.html" data-transition>
-          <span class="tile-in">
-            <span class="tile-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 10 6.5L12 15 2 8.5Z"/><path d="m2 13.5 10 6.5 10-6.5"/></svg></span>
-            <span class="tile-name">Dự Án</span>
-            <span class="tile-desc">17 công trình tiêu biểu</span>
-          </span>
-        </a>
-      </div>
+    <div class="hero-inner">
+      <span class="hero-badge" data-hero-badge><span class="pulse"></span>Kỹ Sư Môi Trường · PMO Manager</span>
 
-      <div class="hero-visual hero-visual--canvas" data-mascot-stage>
-        <img class="lab-bg-img" src="assets/lab/lab-bg.jpg" alt="" aria-hidden="true" data-lab-bg>
-        <canvas id="lab" data-lab-canvas></canvas>
-      </div>
-
-      <div class="hero-tiles hero-tiles--right" data-hero-tiles>
-        <a class="hero-tile" href="contact.html" data-transition>
-          <span class="tile-in">
-            <span class="tile-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2Z"/></svg></span>
-            <span class="tile-name">Liên Hệ</span>
-            <span class="tile-desc">Điện thoại · Email</span>
-          </span>
-        </a>
-        <a class="hero-tile" href="contact.html#contactForm" data-transition>
-          <span class="tile-in">
-            <span class="tile-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/></svg></span>
-            <span class="tile-name">Hợp Tác</span>
-            <span class="tile-desc">Đề xuất &amp; cộng tác</span>
-          </span>
-        </a>
-      </div>
-    </div>
-
-    <div class="hero-bottom" data-hero-bottom>
-      <span class="hero-badge"><span class="pulse"></span>Kỹ Sư Môi Trường · PMO Manager</span>
-      <h1 class="hero-title" data-reveal="lines">
-        <span class="line-mask"><span>Xây dựng hệ thống <span class="accent">nước sạch</span></span></span>
-        <span class="line-mask"><span class="thin">cho tương lai xanh.</span></span>
+      <h1 class="hero-title hero-title--big">
+        <span class="line-mask"><span>Xây dựng hệ thống</span></span>
+        <span class="line-mask"><span><span class="accent">nước sạch</span> cho</span></span>
+        <span class="line-mask"><span class="thin">tương lai xanh.</span></span>
       </h1>
-      <p class="hero-sub">Vận hành hệ thống xử lý nước thải đa công nghệ · Quản lý gói thầu O&amp;M · Giám sát thi công dự án môi trường.</p>
-      <div class="hero-stats">
+
+      <p class="hero-lead" data-illuminate>Vận hành hệ thống xử lý nước thải đa công nghệ, quản lý gói thầu O&amp;M và giám sát thi công các dự án môi trường trọng điểm tại Hà Nội, Hải Phòng và Quảng Ninh.</p>
+
+      <div class="hero-cta" data-hero-cta>
+        <a class="btn btn-primary" href="work.html" data-transition data-magnetic>Xem Dự Án <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn btn-ghost" href="contact.html" data-transition data-magnetic>Liên Hệ Hợp Tác</a>
+      </div>
+
+      <div class="hero-stats" data-hero-stats>
         <div class="hero-stat"><div class="num" data-count="4"></div><div class="lbl">Năm kinh nghiệm</div></div>
         <div class="hero-stat-div"></div>
         <div class="hero-stat"><div class="num" data-count="8"></div><div class="lbl">Nhà máy quản lý</div></div>
@@ -109,21 +79,147 @@
         <div class="hero-stat"><div class="num"><span data-count="17"></span></div><div class="lbl">Dự án tham gia</div></div>
       </div>
     </div>
+
+    <!-- Quick-nav tiles -->
+    <div class="hero-nav" data-reveal="stagger">
+      <a class="hero-tile" href="about.html" data-transition>
+        <span class="tile-in">
+          <span class="tile-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7.5" r="4"/><path d="M4.5 21c.6-4 3.6-6 7.5-6s6.9 2 7.5 6"/></svg></span>
+          <span class="tile-txt"><span class="tile-name">Thông Tin</span><span class="tile-desc">Hồ sơ &amp; kinh nghiệm</span></span>
+          <span class="tile-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </span>
+      </a>
+      <a class="hero-tile" href="work.html" data-transition>
+        <span class="tile-in">
+          <span class="tile-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 10 6.5L12 15 2 8.5Z"/><path d="m2 13.5 10 6.5 10-6.5"/></svg></span>
+          <span class="tile-txt"><span class="tile-name">Dự Án</span><span class="tile-desc">17 công trình tiêu biểu</span></span>
+          <span class="tile-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </span>
+      </a>
+      <a class="hero-tile" href="contact.html" data-transition>
+        <span class="tile-in">
+          <span class="tile-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2Z"/></svg></span>
+          <span class="tile-txt"><span class="tile-name">Liên Hệ</span><span class="tile-desc">Điện thoại · Email</span></span>
+          <span class="tile-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </span>
+      </a>
+      <a class="hero-tile" href="contact.html#contactForm" data-transition>
+        <span class="tile-in">
+          <span class="tile-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/></svg></span>
+          <span class="tile-txt"><span class="tile-name">Hợp Tác</span><span class="tile-desc">Đề xuất &amp; cộng tác</span></span>
+          <span class="tile-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </span>
+      </a>
+    </div>
   </div>
 
   <div class="hero-scroll"><span class="mouse"></span> Cuộn xuống</div>
 </section>
 
-<section id="lab-section" data-lab-section></section>
+<!-- ===================== STORY (word illumination) ===================== -->
+<section class="section story-section">
+  <div class="container">
+    <span class="eyebrow" data-reveal="up">Định hướng nghề nghiệp</span>
+    <p class="story-text" data-illuminate>Tôi theo đuổi một mục tiêu bền bỉ: mỗi công trình xử lý nước thải được vận hành ổn định, mỗi giọt nước trả về môi trường đều đạt chuẩn, và mỗi gói thầu đều minh bạch về tiến độ lẫn chất lượng.</p>
+  </div>
+</section>
+
+<!-- ===================== EXPERTISE — 3D scroll cards ===================== -->
+<section class="section expertise-section" data-stand>
+  <svg class="scurve" viewBox="0 0 1440 700" preserveAspectRatio="none"><path class="curve-soft" d="M-100,420 C350,480 480,160 780,220 C1080,280 1200,520 1560,380"/></svg>
+  <div class="container">
+    <div class="sec-head" data-reveal="up">
+      <span class="eyebrow">Lĩnh vực chuyên môn</span>
+      <h2 class="section-title">Ba trụ cột<br>công việc của tôi.</h2>
+    </div>
+
+    <div class="stand-grid" data-stand-grid>
+      <article class="stand-card">
+        <span class="sc-index">01</span>
+        <div class="sc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C7 8 5 11 5 15a7 7 0 0 0 14 0c0-4-2-7-7-13Z"/></svg></div>
+        <h3 class="sc-title">Vận hành XLNT đa công nghệ</h3>
+        <p class="sc-desc">Vận hành và tối ưu hệ thống xử lý nước thải AAO, MBBR, MBR, SBR… đảm bảo nước đầu ra đạt QCVN, giảm chi phí hóa chất và điện năng.</p>
+        <ul class="sc-list">
+          <li>Giám sát chỉ tiêu đầu vào/đầu ra</li>
+          <li>Điều chỉnh bùn hoạt tính &amp; hóa chất</li>
+          <li>Bảo trì bơm, thổi khí, thiết bị</li>
+        </ul>
+      </article>
+
+      <article class="stand-card">
+        <span class="sc-index">02</span>
+        <div class="sc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg></div>
+        <h3 class="sc-title">Quản lý gói thầu O&amp;M</h3>
+        <p class="sc-desc">Quản lý vận hành &amp; bảo dưỡng nhiều nhà máy trong cùng gói thầu — lập kế hoạch, kiểm soát chi phí, nhân sự và báo cáo định kỳ cho chủ đầu tư.</p>
+        <ul class="sc-list">
+          <li>Lập &amp; theo dõi kế hoạch O&amp;M</li>
+          <li>Kiểm soát vật tư, ngân sách</li>
+          <li>Báo cáo &amp; nghiệm thu định kỳ</li>
+        </ul>
+      </article>
+
+      <article class="stand-card">
+        <span class="sc-index">03</span>
+        <div class="sc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M4 20V8l8-5 8 5v12"/><path d="m9 12 2 2 4-4"/></svg></div>
+        <h3 class="sc-title">Giám sát thi công dự án</h3>
+        <p class="sc-desc">Giám sát thi công lắp đặt thiết bị và hạng mục xây dựng công trình môi trường, đảm bảo đúng bản vẽ, đúng tiến độ và an toàn lao động.</p>
+        <ul class="sc-list">
+          <li>Kiểm tra chất lượng thi công</li>
+          <li>Đối chiếu bản vẽ &amp; hiện trường</li>
+          <li>Quản lý tiến độ &amp; ATLĐ</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CTA ===================== -->
+<section class="section cta-band">
+  <svg class="scurve" viewBox="0 0 1440 500" preserveAspectRatio="none"><path d="M-100,300 C350,360 500,120 780,180 C1080,240 1200,420 1560,320"/></svg>
+  <div class="container">
+    <span class="eyebrow" data-reveal="up">Bạn có một dự án?</span>
+    <h2 class="cta-title" data-reveal="up">Hãy để tôi<br>đồng hành cùng bạn.</h2>
+    <p class="lead" data-reveal="up">Cần vận hành, cải tạo hoặc giám sát thi công hệ thống xử lý nước thải? Tôi sẵn sàng tư vấn và hợp tác.</p>
+    <div class="cta-actions" data-reveal="up">
+      <a class="btn btn-primary" href="contact.html" data-transition data-magnetic>Liên Hệ Ngay <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+  </div>
+</section>
 
 </main>
 
+<!-- ===================== FOOTER ===================== -->
+<footer class="footer">
+  <svg class="scurve" viewBox="0 0 1440 300" preserveAspectRatio="none"><path d="M-100,150 C350,210 500,60 780,110 C1080,160 1200,240 1560,170"/></svg>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">Mạnh <span>Hưng</span></div>
+        <p class="footer-tag">Kỹ sư môi trường &amp; PMO Manager — Hạ Long, Quảng Ninh.</p>
+      </div>
+      <nav class="footer-links" aria-label="Liên kết chân trang">
+        <a href="index.html" data-transition>Trang Chủ</a>
+        <a href="about.html" data-transition>Giới Thiệu</a>
+        <a href="work.html" data-transition>Dự Án</a>
+        <a href="contact.html" data-transition>Liên Hệ</a>
+        <a href="tel:0326560268">0326 560 268</a>
+        <a href="mailto:thombeohau@gmail.com">Email</a>
+      </nav>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Nguyễn Mạnh Hưng · Kỹ Sư Môi Trường &amp; PMO Manager</span>
+      <span>Thiết kế &amp; phát triển với GSAP</span>
+    </div>
+  </div>
+</footer>
+
 <!-- ===================== SCRIPTS ===================== -->
+<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="assets/js/data.js"></script>
 <script src="assets/js/icons.js"></script>
 <script src="assets/js/main.js"></script>
-<script src="assets/js/lab-hero.js"></script>
+<script src="assets/js/home.js"></script>
 </body>
 </html>

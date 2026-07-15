@@ -3,136 +3,30 @@
    ========================================================= */
 
 /* ============================================================
-   HERO (home)
+   HERO (home) — centered text hero, no mascot
    ============================================================ */
 .hero {
   position: relative;
   min-height: 100svh;
   display: flex;
   align-items: center;
-  padding-top: var(--nav-h);
+  padding-top: calc(var(--nav-h) + 30px);
+  padding-bottom: 60px;
   overflow: hidden;
   background:
     radial-gradient(1200px 600px at 85% -5%, var(--accent-050), transparent 60%),
     radial-gradient(900px 500px at -10% 110%, var(--surface-2), transparent 60%);
 }
-.hero-grid-3 {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  gap: clamp(20px, 3.4vw, 48px);
-  align-items: center;
-  width: 100%;
+.hero-inner {
   position: relative;
   z-index: 3;
-}
-
-/* ---- Quick-nav tiles flanking the mascot ---- */
-.hero-tiles { display: flex; flex-direction: column; gap: clamp(18px, 2.4vw, 30px); }
-.hero-tiles--left { align-items: flex-end; }
-.hero-tiles--right { align-items: flex-start; }
-
-.hero-tile {
-  position: relative;
-  display: block;
-  width: clamp(112px, 9.5vw, 152px);
-  aspect-ratio: 3 / 4;
-  border-radius: 18px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-  z-index: 1;
-  transition: transform .5s var(--ease), box-shadow .5s var(--ease), border-color .4s var(--ease);
-  will-change: transform;
-}
-/* Tiles/text default to fully visible (no-JS / JS-failed state). Only once
-   lab-hero.js confirms it booted does .hero-anim-ready gate them behind
-   scroll-reveal — this way a broken CDN script never hides page content. */
-.hero-anim-ready .hero-tile {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transform: translateY(20px);
-}
-.hero-tile.is-visible {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
-/* rotating beam, revealed as a thin rim around .tile-in on hover */
-.hero-tile::before {
-  content: '';
-  position: absolute;
-  left: 50%; top: 50%;
-  width: 250%;
-  aspect-ratio: 1 / 1;
-  background: conic-gradient(from 0deg,
-    transparent 0deg 275deg,
-    rgba(0, 114, 185, 0.95) 320deg,
-    #DFF2FF 347deg,
-    transparent 360deg);
-  transform: translate(-50%, -50%) rotate(0deg);
-  opacity: 0;
-  transition: opacity .45s var(--ease);
-  pointer-events: none;
-}
-.hero-tile:hover::before,
-.hero-tile:focus-visible::before {
-  opacity: 1;
-  animation: tileBeam 3.4s linear infinite;
-}
-@keyframes tileBeam { to { transform: translate(-50%, -50%) rotate(360deg); } }
-.hero-tile.is-visible:hover,
-.hero-tile.is-visible:focus-visible {
-  transform: translateY(-6px) scale(1.2);
-  z-index: 7;
-  box-shadow: var(--shadow-lg);
-  border-color: transparent;
-}
-.tile-in {
-  position: absolute;
-  inset: 3px;
-  border-radius: 19px;
-  background: var(--surface);
+  max-width: 940px;
+  margin: 0 auto;
+  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
-  text-align: center;
-  padding: 14px;
-  z-index: 2;
 }
-.tile-ic {
-  width: 44px; height: 44px;
-  border-radius: 13px;
-  background: var(--accent-050);
-  color: var(--accent);
-  display: grid;
-  place-items: center;
-}
-.tile-ic svg { width: 22px; height: 22px; }
-.tile-name { font-family: var(--font-display); font-weight: 800; font-size: 15.5px; letter-spacing: -0.01em; color: var(--ink); }
-.tile-desc { font-family: var(--font-para); font-weight: 300; font-size: 11px; letter-spacing: 0.05em; color: var(--muted); }
-
-/* ---- Title block moved below the mascot row ---- */
-.hero-bottom {
-  margin-top: clamp(36px, 4.6vw, 60px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  position: relative;
-  z-index: 3;
-}
-.hero-anim-ready .hero-bottom {
-  opacity: 0;
-  transform: translateY(28px);
-}
-.hero-bottom .hero-badge { margin-bottom: 22px; }
-.hero-bottom .hero-title { font-size: clamp(2rem, 4.4vw, 3.6rem); margin-bottom: 16px; }
-.hero-bottom .hero-sub { margin: 0 auto 26px; }
-.hero-bottom .hero-stats { justify-content: center; }
 .hero-badge {
   display: inline-flex;
   align-items: center;
@@ -167,17 +61,28 @@
 }
 .hero-title .accent { color: var(--accent); }
 .hero-title .thin { font-weight: 300; font-family: var(--font-display); }
-.hero-sub {
+.hero-title--big { font-size: clamp(2.7rem, 7.4vw, 5.8rem); }
+/* masked lines for the split-line reveal */
+.hero-title .line-mask { display: block; overflow: hidden; padding-bottom: 0.06em; }
+.hero-title .line-mask > span { display: block; will-change: transform; }
+
+/* Word-illuminated lead paragraph */
+.hero-lead {
   font-family: var(--font-para);
-  font-weight: 300;
-  letter-spacing: 0.02em;
-  color: var(--ink-soft);
-  font-size: clamp(1.05rem, 1.7vw, 1.35rem);
-  max-width: 540px;
-  margin-bottom: 20px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  font-size: clamp(1.08rem, 1.8vw, 1.4rem);
   line-height: 1.7;
+  max-width: 680px;
+  margin: 0 auto 34px;
+  color: var(--ink);
 }
-.hero-stats { display: flex; gap: clamp(20px, 4vw, 44px); align-items: center; }
+.il-word { transition: opacity .2s linear; }
+[data-illuminate].is-lit .il-word { opacity: 1 !important; }
+
+.hero-cta { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; margin-bottom: 52px; }
+
+.hero-stats { display: flex; gap: clamp(20px, 4vw, 44px); align-items: center; justify-content: center; flex-wrap: wrap; }
 .hero-stat .num {
   font-family: var(--font-display);
   font-weight: 800;
@@ -186,52 +91,163 @@
   letter-spacing: -0.02em;
   line-height: 1;
 }
-.hero-stat .num .plus { color: var(--accent); }
 .hero-stat .lbl { font-family: var(--font-para); font-weight: 300; letter-spacing: 0.08em; font-size: 12.5px; color: var(--muted); margin-top: 8px; text-transform: uppercase; }
 .hero-stat-div { width: 1px; height: 46px; background: var(--line); }
 
-/* ============================================================
-   HERO MASCOT — scroll-scrubbed canvas sequence over a static lab backdrop
-   ============================================================ */
-.hero-visual--canvas {
+/* ---- Quick-nav tiles row (below the hero copy) ---- */
+.hero-nav {
   position: relative;
-  justify-self: center;
-  width: min(46vw, 620px);
-  height: 68svh;
-  max-height: 760px;
-  aspect-ratio: 16 / 9;
-  border-radius: 26px;
-  overflow: hidden;
-  box-shadow: var(--shadow-lg);
+  z-index: 3;
+  margin-top: clamp(46px, 6vw, 78px);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(14px, 1.6vw, 22px);
 }
-.lab-bg-img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0;
-  transition: opacity .4s linear;
-  user-select: none;
-  -webkit-user-drag: none;
-}
-.hero-visual--canvas canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+.hero-tile {
+  position: relative;
   display: block;
+  border-radius: 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: transform .45s var(--ease), box-shadow .45s var(--ease), border-color .35s var(--ease);
+  will-change: transform;
+}
+.hero-tile:hover, .hero-tile:focus-visible {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--accent-100);
+}
+/* accent wipe on hover */
+.hero-tile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, var(--accent-050), transparent 70%);
+  opacity: 0;
+  transition: opacity .4s var(--ease);
+  pointer-events: none;
+}
+.hero-tile:hover::before, .hero-tile:focus-visible::before { opacity: 1; }
+.tile-in {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 22px;
+  text-align: left;
+}
+.tile-ic {
+  flex: none;
+  width: 46px; height: 46px;
+  border-radius: 13px;
+  background: var(--accent-050);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  transition: background .35s var(--ease), color .35s var(--ease);
+}
+.tile-ic svg { width: 22px; height: 22px; }
+.hero-tile:hover .tile-ic { background: var(--accent); color: #fff; }
+.tile-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tile-name { font-family: var(--font-display); font-weight: 800; font-size: 15.5px; letter-spacing: -0.01em; color: var(--ink); }
+.tile-desc { font-family: var(--font-para); font-weight: 300; font-size: 11.5px; letter-spacing: 0.03em; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tile-arrow {
+  margin-left: auto;
+  flex: none;
+  color: var(--muted-2);
+  display: grid;
+  place-items: center;
+  transform: translateX(-4px);
+  opacity: 0;
+  transition: transform .35s var(--ease), opacity .35s var(--ease), color .35s var(--ease);
+}
+.tile-arrow svg { width: 18px; height: 18px; }
+.hero-tile:hover .tile-arrow, .hero-tile:focus-visible .tile-arrow { opacity: 1; transform: translateX(0); color: var(--accent); }
+
+/* ============================================================
+   STORY (home) — word illumination block
+   ============================================================ */
+.story-section { padding-block: clamp(70px, 10vw, 130px); }
+.story-text {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.5rem, 3.6vw, 2.7rem);
+  line-height: 1.32;
+  letter-spacing: -0.02em;
+  max-width: 960px;
+  margin-top: 22px;
+  color: var(--ink);
 }
 
 /* ============================================================
-   LAB-SECTION — tall scroll-scrub runway; .hero is pinned over it
+   EXPERTISE (home) — 3D "scroll stand" cards
    ============================================================ */
-#lab-section {
-  position: relative;
-  height: 500vh;
+.expertise-section { position: relative; overflow: hidden; }
+.sec-head { margin-bottom: clamp(36px, 5vw, 60px); }
+.sec-head .section-title { margin-top: 12px; }
+
+.stand-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(20px, 2.6vw, 32px);
+  perspective: 1200px;
 }
-@media (max-width: 860px) {
-  #lab-section { height: 320vh; }
+.stand-card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg, 22px);
+  padding: clamp(26px, 2.4vw, 38px);
+  box-shadow: var(--shadow-md, 0 18px 40px rgba(14,27,38,0.07));
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+}
+.sc-index {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--accent-300);
+  letter-spacing: 0.04em;
+}
+.sc-ic {
+  width: 56px; height: 56px;
+  margin: 18px 0 20px;
+  border-radius: 16px;
+  background: var(--accent-050);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+}
+.sc-ic svg { width: 28px; height: 28px; }
+.sc-title { font-size: 1.25rem; line-height: 1.25; margin-bottom: 12px; }
+.sc-desc {
+  font-family: var(--font-para);
+  font-weight: 300;
+  font-size: 0.98rem;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  margin-bottom: 18px;
+}
+.sc-list { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+.sc-list li {
+  position: relative;
+  padding-left: 24px;
+  font-family: var(--font-para);
+  font-weight: 300;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.sc-list li::before {
+  content: '';
+  position: absolute;
+  left: 4px; top: 8px;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.55;
 }
 
 .hero-scroll {
@@ -714,13 +730,10 @@
 @media (max-width: 1024px) {
   .services-grid { grid-template-columns: repeat(2, 1fr); }
   .plants-grid { grid-template-columns: repeat(3, 1fr); }
+  .stand-grid { grid-template-columns: 1fr; gap: 22px; perspective: 900px; }
+  .hero-nav { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 860px) {
-  .hero-grid-3 { grid-template-columns: 1fr; gap: 28px; }
-  .hero-visual--canvas { order: -1; justify-self: center; width: 94vw; height: auto; max-height: none; }
-  .hero-tiles { flex-direction: row; justify-content: center; }
-  .hero-tiles--left, .hero-tiles--right { align-items: center; }
-  .hero-tile { width: clamp(104px, 30vw, 130px); }
   .hero-scroll { display: none; }
   .about-grid { grid-template-columns: 1fr; gap: 60px; }
   .about-media { max-width: 420px; }
@@ -736,8 +749,11 @@
   .plants-grid { grid-template-columns: repeat(2, 1fr); }
   .proj-detail-grid { grid-template-columns: 1fr; }
   .form-row { grid-template-columns: 1fr; }
+  .hero-nav { grid-template-columns: 1fr; }
+  .hero-cta { width: 100%; }
+  .hero-cta .btn { flex: 1; justify-content: center; }
   /* Long Vietnamese words must not bleed past the viewport */
-  .hero-title { font-size: clamp(2rem, 8.4vw, 2.7rem); }
+  .hero-title, .hero-title--big { font-size: clamp(2rem, 8.4vw, 2.7rem); }
   .page-hero-title { font-size: clamp(2rem, 9vw, 3rem); }
   .cta-title { font-size: clamp(1.85rem, 8.5vw, 2.6rem); }
   /* allow masked hero lines to wrap so multi-word lines never overflow;
