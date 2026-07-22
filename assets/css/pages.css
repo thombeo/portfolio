@@ -3,7 +3,7 @@
    ========================================================= */
 
 /* ============================================================
-   HERO (home) — centered text hero, no mascot
+   HERO (home) — split layout: tiêu đề bên trái, mascot video bên phải
    ============================================================ */
 .hero {
   position: relative;
@@ -26,6 +26,62 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+/* ---- Split variant: nội dung dồn về trái, chừa chỗ cho mascot ---- */
+.hero--split .hero-inner {
+  max-width: min(660px, 58%);
+  margin: 0;
+  text-align: left;
+  align-items: flex-start;
+}
+.hero--split .hero-lead { margin-left: 0; margin-right: 0; max-width: 600px; }
+.hero--split .hero-cta,
+.hero--split .hero-stats { justify-content: flex-start; }
+.hero--split .hero-title--big { font-size: clamp(2.8rem, 6.4vw, 5.4rem); }
+
+/* ---- Mascot video: tách nền, to & rõ nét, lệch về bên phải ---- */
+.hero-mascot {
+  position: absolute;
+  z-index: 2;               /* trên nền, dưới chữ */
+  right: -3%;
+  /* Căn giữa theo chiều dọc bằng inset thay vì translateY(-50%), để GSAP
+     có thể tự do animate yPercent/scale mà không ghi đè transform căn giữa. */
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  /* Video crop sát nhân vật ở 868x720 (≈1.2:1). Khung rộng hơn bản cũ vì cú đá
+     dang chân, nên cần bề rộng lớn hơn để thân người giữ nguyên kích thước.
+     Các mốc đã nhân ~1.25 so với bản trước để nhân vật to lên 25%
+     (bản trước render 868px ở 1440px viewport -> nay ~1085px). */
+  width: clamp(650px, 75vw, 1125px);
+  pointer-events: none;
+  opacity: 0.92;            /* sáng & rõ nét, gần như đầy đủ */
+  will-change: transform, opacity;
+}
+.hero-mascot-video {
+  display: block;
+  /* width:100% để video giãn đầy bề rộng của .hero-mascot — dùng width:auto
+     sẽ khoá video ở kích thước nội tại 868px và mọi thay đổi bề rộng host
+     trở nên vô hiệu. max-height chặn lại trên màn thấp để không cắt mũ,
+     aspect-ratio giữ đúng tỉ lệ khi chiều cao là ràng buộc quyết định. */
+  width: 100%;
+  aspect-ratio: 772 / 640;   /* = 868/720, giữ nguyên tỉ lệ khung mascot */
+  /* Cho phép cao tới toàn bộ viewport: mascot đứng giữa hero nên phần dư
+     phía trên/dưới là nền trong suốt, không đụng nav cũng không tràn section. */
+  max-height: 100svh;
+  object-fit: contain;
+  margin-inline: auto;
+  /* Video mã hoá ở 1280x720 (độ phân giải gốc) nên đã đủ nét — chỉ tăng nhẹ
+     độ bão hoà, không ép contrast để tránh bết chi tiết trên mặt & đồng phục. */
+  filter: saturate(1.12);
+  -webkit-filter: saturate(1.12);
+  /* Giữ nét khi trình duyệt phải thu nhỏ video xuống bề rộng CSS */
+  image-rendering: -webkit-optimize-contrast;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-mascot { opacity: 0.85; }
 }
 .hero-badge {
   display: inline-flex;
@@ -130,6 +186,42 @@
   pointer-events: none;
 }
 .hero-tile:hover::before, .hero-tile:focus-visible::before { opacity: 1; }
+
+/* Đường sáng chạy viền quanh ô khi rê chuột / focus bàn phím */
+.hero-tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(from var(--ring-angle, 0deg),
+    transparent 0deg,
+    transparent 255deg,
+    var(--accent) 310deg,
+    #7dd3fc 334deg,
+    var(--accent) 352deg,
+    transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask-composite: exclude;
+  opacity: 0;
+  transition: opacity .35s var(--ease);
+  pointer-events: none;
+  z-index: 2;
+}
+.hero-tile:hover::after, .hero-tile:focus-visible::after {
+  opacity: 1;
+  animation: ringSpin 2s linear infinite;
+}
+
+/* Tôn trọng người dùng tắt hiệu ứng chuyển động: viền vẫn sáng nhưng đứng yên */
+@media (prefers-reduced-motion: reduce) {
+  .hero-tile:hover::after, .hero-tile:focus-visible::after,
+  .portrait-frame:hover::before, .portrait-frame:focus-within::before {
+    animation: none;
+  }
+}
 .tile-in {
   position: relative;
   z-index: 1;
@@ -168,18 +260,193 @@
 .hero-tile:hover .tile-arrow, .hero-tile:focus-visible .tile-arrow { opacity: 1; transform: translateX(0); color: var(--accent); }
 
 /* ============================================================
-   STORY (home) — word illumination block
+   STORY (home) — chân dung + word illumination block
    ============================================================ */
-.story-section { padding-block: clamp(70px, 10vw, 130px); }
+.story-section {
+  padding-block: clamp(70px, 10vw, 130px);
+  position: relative;
+}
+/* Lớp phủ sáng làm dịu ảnh nền site-bg phía sau, giúp chữ đọc rõ */
+.story-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg,
+    rgba(255,255,255,0.55),
+    rgba(255,255,255,0.86) 45%,
+    rgba(255,255,255,0.55));
+  pointer-events: none;
+}
+.story-section > .container { position: relative; z-index: 1; }
+
+.story-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: clamp(36px, 6vw, 88px);
+  align-items: center;
+}
+.story-body { min-width: 0; }
+
 .story-text {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: clamp(1.5rem, 3.6vw, 2.7rem);
-  line-height: 1.32;
+  font-size: clamp(1.4rem, 2.9vw, 2.3rem);
+  line-height: 1.34;
   letter-spacing: -0.02em;
-  max-width: 960px;
   margin-top: 22px;
   color: var(--ink);
+}
+
+/* Đăng ký biến góc để trình duyệt nội suy được (điều kiện để animate
+   conic-gradient). Không hỗ trợ @property thì viền vẫn sáng, chỉ không quay. */
+@property --ring-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* ---- Khung chân dung kiểu cửa sổ vòm: đỉnh bo tròn, nổi khối ---- */
+.portrait-frame {
+  position: relative;
+  margin: 0;
+  /* Vòm: bán kính ngang 50% khép hai góc trên thành cung tròn liền mạch.
+     Bán kính dọc nhỉnh hơn ảnh bên trong để viền bao đều quanh cung. */
+  border-radius: 50% 50% 24px 24px / 32% 32% 24px 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 14px 14px 0;
+  box-shadow:
+    0 2px 4px rgba(16, 32, 52, 0.04),
+    0 12px 28px rgba(16, 32, 52, 0.08),
+    0 34px 70px -20px rgba(16, 32, 52, 0.18);
+  transition: transform .55s cubic-bezier(.22,.61,.36,1), box-shadow .55s cubic-bezier(.22,.61,.36,1);
+}
+.portrait-frame:hover {
+  transform: translateY(-10px);
+  box-shadow:
+    0 2px 4px rgba(16, 32, 52, 0.05),
+    0 20px 42px rgba(16, 32, 52, 0.12),
+    0 54px 100px -22px rgba(16, 32, 52, 0.26),
+    0 0 0 1px var(--accent-100);
+}
+
+/* Đường sáng chạy vòng quanh khung khi hover.
+   Dùng conic-gradient quay tròn, khoét ruột bằng mask để chỉ còn lại viền. */
+.portrait-frame::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: conic-gradient(from var(--ring-angle, 0deg),
+    transparent 0deg,
+    transparent 250deg,
+    var(--accent) 305deg,
+    #7dd3fc 330deg,
+    var(--accent) 350deg,
+    transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask-composite: exclude;
+  opacity: 0;
+  transition: opacity .45s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+.portrait-frame:hover::before,
+.portrait-frame:focus-within::before {
+  opacity: 1;
+  animation: ringSpin 2.4s linear infinite;
+}
+@keyframes ringSpin {
+  to { --ring-angle: 360deg; }
+}
+
+/* Vệt nhấn màu thương hiệu chạy dọc mép trái khung */
+.portrait-frame .pf-accent {
+  position: absolute;
+  left: 0; top: 38%; bottom: 26px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(180deg, var(--accent), transparent);
+  opacity: .85;
+}
+.pf-media {
+  position: relative;
+  /* Vòm ảnh: bán kính ngang = nửa bề rộng ảnh -> hai góc trên khép thành nửa
+     đường tròn hoàn chỉnh; bán kính dọc lớn hơn để cung cao và thoáng. */
+  border-radius: 50% 50% 14px 14px / 34% 34% 14px 14px;
+  overflow: hidden;
+  background: var(--surface-2);
+  /* Safari: ép tạo stacking context để overflow cắt đúng phần bo tròn */
+  isolation: isolate;
+  transform: translateZ(0);
+}
+.pf-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* Khung cao hơn (3/4.4) để cung vòm ăn vào vùng nền phía trên đầu,
+     object-position đẩy ảnh xuống chút để đỉnh đầu không bị cung cắt. */
+  aspect-ratio: 3 / 4.4;
+  object-fit: cover;
+  object-position: 50% 34%;
+  /* ảnh gốc nền trắng — tăng nhẹ tương phản cho khối mặt rõ hơn */
+  filter: contrast(1.04) saturate(1.02);
+}
+/* Viền trong mảnh giúp mép ảnh sắc nét trên nền trắng */
+.pf-media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(16, 32, 52, 0.06);
+  pointer-events: none;
+}
+.pf-caption {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 6px 18px;
+}
+.pf-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(1.05rem, 1.5vw, 1.25rem);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.pf-role {
+  font-family: var(--font-para);
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* ---- Dòng ký tên dưới đoạn tuyên ngôn ---- */
+.story-sign {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: clamp(24px, 3vw, 36px);
+}
+.story-sign .ss-line {
+  width: clamp(32px, 5vw, 56px);
+  height: 2px;
+  border-radius: 2px;
+  background: var(--accent);
+  flex: none;
+}
+.story-sign .ss-text {
+  font-family: var(--font-para);
+  font-weight: 300;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 11.5px;
+  color: var(--muted);
 }
 
 /* ============================================================
@@ -732,11 +999,25 @@
   .plants-grid { grid-template-columns: repeat(3, 1fr); }
   .stand-grid { grid-template-columns: 1fr; gap: 22px; perspective: 900px; }
   .hero-nav { grid-template-columns: repeat(2, 1fr); }
+  .hero--split .hero-inner { max-width: min(600px, 60%); }
+  .hero-mascot { right: -8%; width: clamp(525px, 65vw, 825px); }
 }
 @media (max-width: 860px) {
   .hero-scroll { display: none; }
+  /* Mascot lùi hẳn ra sau làm nền, chữ chiếm toàn bộ bề ngang */
+  .hero--split .hero-inner { max-width: 100%; width: 100%; }
+  .hero--split .hero-lead { max-width: 100%; }
+  /* Mobile: mascot nằm ngay sau khối chữ nên phải mờ để không cản đọc */
+  .hero-mascot {
+    right: -10%;
+    width: min(72vw, 440px);
+    opacity: 0.3;
+  }
   .about-grid { grid-template-columns: 1fr; gap: 60px; }
   .about-media { max-width: 420px; }
+  /* Story: xếp dọc, ảnh lên trước và thu gọn cho cân */
+  .story-grid { grid-template-columns: 1fr; gap: 40px; }
+  .portrait-frame { max-width: 400px; }
   .about-highlights { grid-template-columns: 1fr 1fr; }
   .contact-grid { grid-template-columns: 1fr; }
   .contact-info { max-width: 560px; }
@@ -751,7 +1032,7 @@
   .form-row { grid-template-columns: 1fr; }
   .hero-nav { grid-template-columns: 1fr; }
   .hero-cta { width: 100%; }
-  .hero-cta .btn { flex: 1; justify-content: center; }
+  .hero-cta .btn { flex: 1 1 100%; justify-content: center; min-width: 0; }
   /* Long Vietnamese words must not bleed past the viewport */
   .hero-title, .hero-title--big { font-size: clamp(2rem, 8.4vw, 2.7rem); }
   .page-hero-title { font-size: clamp(2rem, 9vw, 3rem); }

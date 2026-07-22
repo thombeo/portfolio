@@ -43,28 +43,38 @@
 <main>
 
 <!-- ===================== HERO ===================== -->
-<section class="hero hero--text" data-hero>
+<section class="hero hero--split" data-hero>
   <svg class="scurve" viewBox="0 0 1440 900" preserveAspectRatio="none">
     <path class="curve-soft" d="M-100,650 C300,720 420,300 720,360 C1020,420 1140,760 1560,620"/>
     <path d="M-100,520 C250,560 500,180 760,260 C1080,360 1180,640 1560,500"/>
   </svg>
-  <span class="shape shape-ring" style="width:120px;height:120px;top:16%;right:9%;" data-parallax="0.25"></span>
   <span class="shape shape-dot" style="width:14px;height:14px;top:68%;right:20%;" data-parallax="0.5"></span>
   <span class="shape shape-ring" style="width:70px;height:70px;top:74%;left:8%;" data-parallax="0.4"></span>
   <span class="blob blob-accent" style="width:460px;height:460px;top:-90px;right:-70px;"></span>
   <span class="blob blob-accent" style="width:360px;height:360px;bottom:-120px;left:-80px;"></span>
+
+  <!-- Mascot video (đã tách nền), lệch phải, mờ 30%.
+       WebM/VP9 là định dạng duy nhất giữ được alpha trên web; Safari chưa hỗ
+       trợ nên sẽ tự động dừng ở ảnh poster PNG trong suốt (cũng đã tách nền). -->
+  <div class="hero-mascot" aria-hidden="true" data-hero-mascot>
+    <video class="hero-mascot-video" autoplay muted loop playsinline preload="auto"
+           poster="assets/video/mascot-poster.png">
+      <source src="assets/video/mascot.webm" type="video/webm">
+    </video>
+  </div>
 
   <div class="container">
     <div class="hero-inner">
       <span class="hero-badge" data-hero-badge><span class="pulse"></span>Kỹ Sư Môi Trường · PMO Manager</span>
 
       <h1 class="hero-title hero-title--big">
-        <span class="line-mask"><span>Xây dựng hệ thống</span></span>
-        <span class="line-mask"><span><span class="accent">nước sạch</span> cho</span></span>
-        <span class="line-mask"><span class="thin">tương lai xanh.</span></span>
+        <span class="line-mask"><span>Vận hành</span></span>
+        <span class="line-mask"><span><span class="accent">chuẩn kỹ thuật</span></span></span>
+        <span class="line-mask"><span class="thin">từ thiết kế đến</span></span>
+        <span class="line-mask"><span>nghiệm thu.</span></span>
       </h1>
 
-      <p class="hero-lead" data-illuminate>Vận hành hệ thống xử lý nước thải đa công nghệ, quản lý gói thầu O&amp;M và giám sát thi công các dự án môi trường trọng điểm tại Hà Nội, Hải Phòng và Quảng Ninh.</p>
+      <p class="hero-lead" data-illuminate>4+ năm vận hành hệ thống xử lý nước thải đa công nghệ AAO · MBBR · MBR · SBR, quản lý gói thầu O&amp;M cho 8 nhà máy và giám sát thi công 17 dự án môi trường trọng điểm tại Hà Nội, Hải Phòng và Quảng Ninh.</p>
 
       <div class="hero-cta" data-hero-cta>
         <a class="btn btn-primary" href="work.html" data-transition data-magnetic>Xem Dự Án <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
@@ -116,11 +126,36 @@
   <div class="hero-scroll"><span class="mouse"></span> Cuộn xuống</div>
 </section>
 
-<!-- ===================== STORY (word illumination) ===================== -->
+<!-- ===================== STORY (chân dung + word illumination) ===================== -->
 <section class="section story-section">
   <div class="container">
-    <span class="eyebrow" data-reveal="up">Định hướng nghề nghiệp</span>
-    <p class="story-text" data-illuminate>Tôi theo đuổi một mục tiêu bền bỉ: mỗi công trình xử lý nước thải được vận hành ổn định, mỗi giọt nước trả về môi trường đều đạt chuẩn, và mỗi gói thầu đều minh bạch về tiến độ lẫn chất lượng.</p>
+    <div class="story-grid">
+
+      <!-- Cột trái: khung chân dung bo góc, nổi khối -->
+      <figure class="portrait-frame" data-reveal="up">
+        <span class="pf-accent" aria-hidden="true"></span>
+        <div class="pf-media">
+          <img src="assets/img/portrait.jpg" width="1000" height="1250" loading="lazy" decoding="async"
+               alt="Chân dung Nguyễn Mạnh Hưng — Kỹ sư môi trường &amp; PMO Manager">
+        </div>
+        <figcaption class="pf-caption">
+          <span class="pf-name">Nguyễn Mạnh Hưng</span>
+          <span class="pf-role">Kỹ Sư Môi Trường · PMO Manager</span>
+        </figcaption>
+      </figure>
+
+      <!-- Cột phải: tuyên ngôn nghề nghiệp -->
+      <div class="story-body">
+        <span class="eyebrow" data-reveal="up">Định hướng nghề nghiệp</span>
+        <p class="story-text" data-illuminate>Tôi theo đuổi một mục tiêu bền bỉ: mỗi công trình xử lý nước thải được vận hành ổn định, mỗi giọt nước trả về môi trường đều đạt chuẩn, và mỗi gói thầu đều minh bạch về tiến độ lẫn chất lượng.</p>
+
+        <div class="story-sign" data-reveal="up">
+          <span class="ss-line" aria-hidden="true"></span>
+          <span class="ss-text">Cam kết trong từng công trình</span>
+        </div>
+      </div>
+
+    </div>
   </div>
 </section>
 

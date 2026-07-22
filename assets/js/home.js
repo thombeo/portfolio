@@ -119,6 +119,47 @@
   }
 
   /* ------------------------------------------------------------
+     4. HERO MASCOT VIDEO
+     Fades/slides in with the hero intro, then drifts slowly upward as
+     the hero scrolls away. The fade-in target is read from the CSS
+     opacity so desktop/mobile breakpoints stay the single source of truth.
+     ------------------------------------------------------------ */
+  function initHeroMascot() {
+    const mascot = $('[data-hero-mascot]');
+    if (!mascot) return;
+
+    const video = $('.hero-mascot-video', mascot);
+    // Autoplay can be rejected (e.g. battery saver); the poster then stands in.
+    if (video && video.paused) {
+      const p = video.play();
+      if (p && typeof p.catch === 'function') p.catch(() => {});
+    }
+
+    if (!hasGSAP || prefersReduced) return;
+
+    const cssOpacity = parseFloat(getComputedStyle(mascot).opacity);
+    const restOpacity = Number.isFinite(cssOpacity) ? cssOpacity : 0.92;
+    gsap.fromTo(mascot,
+      { opacity: 0, xPercent: 8, scale: 1.06 },
+      { opacity: restOpacity, xPercent: 0, scale: 1, duration: 1.4, delay: 0.85, ease: 'power3.out' }
+    );
+
+    if (!hasST) return;
+    // Parallax drift — translateY here is composed on top of the CSS
+    // centering transform, so animate yPercent rather than y.
+    gsap.to(mascot, {
+      yPercent: -12,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '[data-hero]',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: true
+      }
+    });
+  }
+
+  /* ------------------------------------------------------------
      Boot
      ------------------------------------------------------------ */
   function boot() {
@@ -126,6 +167,7 @@
     initLenis();
     initIlluminate();
     initScrollStand();
+    initHeroMascot();
     // Recompute all trigger positions now that Lenis + new triggers exist.
     if (hasST) ScrollTrigger.refresh();
   }
