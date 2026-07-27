@@ -95,6 +95,7 @@ test("keeps a fixed navigation geometry with the avatar leading the links", () =
 
 test("runs the 12 FPS preload, three-second hold, and upward reveal", () => {
   assert.match(sourceHtml, /id="site-preloader"/);
+  assert.match(sourceHtml, /assets\/preload-first\.webp/);
   assert.match(sourceHtml, /assets\/preload-sequence-12fps\.webp/);
   assert.match(sourceHtml, /assets\/preload-final\.webp/);
   assert.match(sourceHtml, /Hợp tác vận hành từ hôm nay/);
@@ -102,6 +103,8 @@ test("runs the 12 FPS preload, three-second hold, and upward reveal", () => {
   assert.match(sourceHtml, /const holdDuration = reduceMotion \? 900 : 3000/);
   assert.match(sourceHtml, /\.site-preloader\.is-exiting[\s\S]*?translate3d\(0, -105%, 0\)/);
   assert.match(sourceHtml, /backdrop-filter:\s*blur\(28px\)/);
+  assert.match(sourceHtml, /await fetch\("assets\/preload-sequence-12fps\.webp"/);
+  assert.match(sourceHtml, /URL\.createObjectURL\(await response\.blob\(\)\)/);
 });
 
 test("uses pointer-responsive 3D card physics without affecting reduced motion", () => {
@@ -133,8 +136,11 @@ test("serves the navigation avatar", async () => {
   assert.ok((await response.arrayBuffer()).byteLength > 10_000);
 });
 
-test("serves both WebP preload assets", async () => {
-  const [sequenceResponse, finalResponse] = await Promise.all([
+test("serves all WebP preload assets", async () => {
+  const [firstResponse, sequenceResponse, finalResponse] = await Promise.all([
+    worker.fetch(
+      new Request("https://portfolio.test/assets/preload-first.webp"),
+    ),
     worker.fetch(
       new Request("https://portfolio.test/assets/preload-sequence-12fps.webp"),
     ),
@@ -143,10 +149,13 @@ test("serves both WebP preload assets", async () => {
     ),
   ]);
 
+  assert.equal(firstResponse.status, 200);
   assert.equal(sequenceResponse.status, 200);
   assert.equal(finalResponse.status, 200);
+  assert.equal(firstResponse.headers.get("content-type"), "image/webp");
   assert.equal(sequenceResponse.headers.get("content-type"), "image/webp");
   assert.equal(finalResponse.headers.get("content-type"), "image/webp");
+  assert.ok((await firstResponse.arrayBuffer()).byteLength > 10_000);
   assert.ok((await sequenceResponse.arrayBuffer()).byteLength > 1_000_000);
   assert.ok((await finalResponse.arrayBuffer()).byteLength > 20_000);
 });

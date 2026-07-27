@@ -1053,7 +1053,7 @@
 </head>
 <body>
   <div class="site-preloader" id="site-preloader" role="status" aria-live="polite" aria-label="Đang tải hồ sơ">
-    <img class="preloader-visual" id="preloader-visual" alt="">
+    <img class="preloader-visual" id="preloader-visual" src="assets/preload-first.webp" alt="">
     <div class="preloader-message liquid-glass">Hợp tác vận hành từ hôm nay</div>
   </div>
 
@@ -1229,6 +1229,7 @@
       let sequenceTimer = 0;
       let holdTimer = 0;
       let fallbackTimer = 0;
+      let sequenceObjectUrl = "";
       let finished = false;
 
       if (!preloader || !visual) return;
@@ -1236,6 +1237,7 @@
 
       const removePreloader = () => {
         if (!preloader.isConnected) return;
+        if (sequenceObjectUrl) URL.revokeObjectURL(sequenceObjectUrl);
         preloader.remove();
         document.body.classList.remove("is-preloading");
       };
@@ -1259,18 +1261,33 @@
         holdTimer = window.setTimeout(exitPreloader, holdDuration);
       };
 
-      visual.addEventListener("load", () => {
+      const startSequence = async () => {
         if (reduceMotion) {
-          holdFinalFrame();
+          visual.addEventListener("load", holdFinalFrame, { once: true });
+          visual.src = "assets/preload-final.webp";
           return;
         }
-        sequenceTimer = window.setTimeout(holdFinalFrame, sequenceDuration);
-      }, { once: true });
+
+        try {
+          const response = await fetch("assets/preload-sequence-12fps.webp", {
+            cache: "force-cache"
+          });
+          if (!response.ok) throw new Error("Preload animation unavailable");
+
+          sequenceObjectUrl = URL.createObjectURL(await response.blob());
+          visual.addEventListener("load", () => {
+            requestAnimationFrame(() => {
+              sequenceTimer = window.setTimeout(holdFinalFrame, sequenceDuration);
+            });
+          }, { once: true });
+          visual.src = sequenceObjectUrl;
+        } catch {
+          holdFinalFrame();
+        }
+      };
 
       visual.addEventListener("error", holdFinalFrame, { once: true });
-      visual.src = reduceMotion
-        ? "assets/preload-final.webp"
-        : "assets/preload-sequence-12fps.webp";
+      startSequence();
 
       document.addEventListener("keydown", (event) => {
         if (event.key === "Escape") exitPreloader();

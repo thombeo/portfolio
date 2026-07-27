@@ -3,6 +3,7 @@ $ErrorActionPreference = "Stop"
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $sourceHtml = Join-Path $projectRoot "index.html"
 $sourceAvatar = Join-Path $projectRoot "assets\avatar-nguyen-manh-hung.png"
+$sourcePreloadFirst = Join-Path $projectRoot "assets\preload-first.webp"
 $sourcePreloadSequence = Join-Path $projectRoot "assets\preload-sequence-12fps.webp"
 $sourcePreloadFinal = Join-Path $projectRoot "assets\preload-final.webp"
 $serverDirectory = Join-Path $projectRoot "dist\server"
@@ -20,6 +21,10 @@ if (-not (Test-Path -LiteralPath $sourcePreloadSequence)) {
   throw "Missing preload animation"
 }
 
+if (-not (Test-Path -LiteralPath $sourcePreloadFirst)) {
+  throw "Missing preload first frame"
+}
+
 if (-not (Test-Path -LiteralPath $sourcePreloadFinal)) {
   throw "Missing preload final frame"
 }
@@ -29,17 +34,19 @@ New-Item -ItemType Directory -Force -Path $serverDirectory | Out-Null
 $html = [string](Get-Content -Raw -Encoding UTF8 -LiteralPath $sourceHtml)
 $htmlJson = ConvertTo-Json -InputObject $html -Compress
 $avatarBase64 = [Convert]::ToBase64String([IO.File]::ReadAllBytes($sourceAvatar))
+$preloadFirstBase64 = [Convert]::ToBase64String([IO.File]::ReadAllBytes($sourcePreloadFirst))
 $preloadSequenceBase64 = [Convert]::ToBase64String([IO.File]::ReadAllBytes($sourcePreloadSequence))
 $preloadFinalBase64 = [Convert]::ToBase64String([IO.File]::ReadAllBytes($sourcePreloadFinal))
 
 $workerSource = @"
 const html = $htmlJson;
 const avatarImage = "$avatarBase64";
+const preloadFirst = "$preloadFirstBase64";
 const preloadSequence = "$preloadSequenceBase64";
 const preloadFinal = "$preloadFinalBase64";
 
 const securityHeaders = {
-  "content-security-policy": "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net",
+  "content-security-policy": "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net",
   "permissions-policy": "camera=(), microphone=(), geolocation=()",
   "referrer-policy": "strict-origin-when-cross-origin",
   "x-content-type-options": "nosniff",
@@ -79,6 +86,16 @@ const worker = {
 
     if (url.pathname === "/assets/preload-sequence-12fps.webp") {
       return new Response(isHead ? null : decodeBase64(preloadSequence), {
+        headers: {
+          "cache-control": "public, max-age=31536000, immutable",
+          "content-type": "image/webp",
+          ...securityHeaders
+        }
+      });
+    }
+
+    if (url.pathname === "/assets/preload-first.webp") {
+      return new Response(isHead ? null : decodeBase64(preloadFirst), {
         headers: {
           "cache-control": "public, max-age=31536000, immutable",
           "content-type": "image/webp",
