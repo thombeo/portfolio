@@ -11,6 +11,13 @@
   <meta property="og:description" content="Vận hành hệ thống xử lý nước thải, quản lý gói thầu O&amp;M và giám sát thi công.">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
+  <script>
+    try {
+      if (sessionStorage.getItem("portfolio-preloader-played") === "1") {
+        document.documentElement.classList.add("preloader-seen");
+      }
+    } catch {}
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -198,6 +205,10 @@
       overflow: hidden;
     }
 
+    .preloader-seen .site-preloader {
+      display: none;
+    }
+
     .site-preloader {
       display: grid;
       position: fixed;
@@ -207,7 +218,7 @@
       background: #d8d8d5;
       place-items: center;
       transform: translate3d(0, 0, 0);
-      transition: transform 1.25s cubic-bezier(0.76, 0, 0.24, 1);
+      transition: transform 1.45s cubic-bezier(0.65, 0, 0.35, 1);
       will-change: transform;
     }
 
@@ -220,6 +231,9 @@
       inset: 0;
       width: 100%;
       height: 100%;
+    }
+
+    .preloader-poster {
       object-fit: cover;
     }
 
@@ -330,7 +344,8 @@
     }
 
     .nav-links > a:not(.nav-cta):hover,
-    .nav-links > a:not(.nav-cta):focus-visible {
+    .nav-links > a:not(.nav-cta):focus-visible,
+    .nav-links > a:not(.nav-cta)[aria-current="page"] {
       background: rgba(255, 255, 255, 0.64);
       color: var(--blue-deep);
       transform: translateY(-1px);
@@ -1041,6 +1056,11 @@
       .liquid-canvas {
         opacity: 0.46;
       }
+
+      .site-preloader {
+        transition-duration: 1.45s !important;
+        transition-timing-function: cubic-bezier(0.65, 0, 0.35, 1) !important;
+      }
     }
 
     @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -1053,7 +1073,7 @@
 </head>
 <body>
   <div class="site-preloader" id="site-preloader" role="status" aria-live="polite" aria-label="Đang tải hồ sơ">
-    <img class="preloader-visual" id="preloader-visual" src="assets/preload-first.webp" alt="">
+    <img class="preloader-visual preloader-poster" id="preloader-poster" src="assets/preload-hold.webp?v=1" alt="">
     <div class="preloader-message liquid-glass">Hợp tác vận hành từ hôm nay</div>
   </div>
 
@@ -1061,17 +1081,17 @@
 
   <header class="site-header">
     <nav class="nav-glass liquid-glass" aria-label="Điều hướng chính">
-      <a class="brand" href="#top" aria-label="Nguyễn Mạnh Hưng — về đầu trang">
+      <a class="brand" href="index.html" aria-label="Nguyễn Mạnh Hưng — Trang chủ">
         <img class="nav-avatar" src="assets/avatar-nguyen-manh-hung.png" alt="">
       </a>
 
       <div class="nav-links" id="navigation-links" data-open="false">
-        <a href="#about">Giới thiệu</a>
-        <a href="#capabilities">Năng lực</a>
-        <a href="#projects">Dự án</a>
+        <a href="index.html" aria-current="page">Trang chủ</a>
+        <a href="about.html">Giới thiệu</a>
+        <a href="work.html">Dự án</a>
       </div>
 
-      <a class="nav-cta magnetic" href="#contact">Hợp tác</a>
+      <a class="nav-cta magnetic" href="contact.html">Hợp tác</a>
 
       <button class="menu-button" type="button" aria-expanded="false" aria-controls="navigation-links" aria-label="Mở menu">
         <span aria-hidden="true"></span>
@@ -1222,22 +1242,32 @@
   <script>
     (() => {
       const preloader = document.querySelector("#site-preloader");
-      const visual = document.querySelector("#preloader-visual");
+      const poster = document.querySelector("#preloader-poster");
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const sequenceDuration = 7167;
-      const holdDuration = reduceMotion ? 900 : 3000;
+      const framesPerSecond = 12;
+      const sequenceDuration = 7166;
+      const holdDuration = 1000;
+      const animationSource = "assets/preload-final.webp";
+      const storageKey = "portfolio-preloader-played";
       let sequenceTimer = 0;
       let holdTimer = 0;
       let fallbackTimer = 0;
-      let sequenceObjectUrl = "";
       let finished = false;
 
-      if (!preloader || !visual) return;
+      if (!preloader || !poster) return;
+      if (document.documentElement.classList.contains("preloader-seen")) {
+        preloader.remove();
+        return;
+      }
+
+      try {
+        sessionStorage.setItem(storageKey, "1");
+      } catch {}
+
       document.body.classList.add("is-preloading");
 
       const removePreloader = () => {
         if (!preloader.isConnected) return;
-        if (sequenceObjectUrl) URL.revokeObjectURL(sequenceObjectUrl);
         preloader.remove();
         document.body.classList.remove("is-preloading");
       };
@@ -1250,43 +1280,34 @@
         preloader.classList.add("is-exiting");
         preloader.setAttribute("aria-label", "Hồ sơ đã sẵn sàng");
         preloader.addEventListener("transitionend", removePreloader, { once: true });
-        fallbackTimer = window.setTimeout(removePreloader, reduceMotion ? 100 : 1600);
+        fallbackTimer = window.setTimeout(removePreloader, 1800);
       };
 
       const holdFinalFrame = () => {
         clearTimeout(sequenceTimer);
-        visual.src = "assets/preload-final.webp";
         preloader.classList.add("is-holding");
         preloader.setAttribute("aria-label", "Hợp tác vận hành từ hôm nay");
         holdTimer = window.setTimeout(exitPreloader, holdDuration);
       };
 
-      const startSequence = async () => {
-        if (reduceMotion) {
-          visual.addEventListener("load", holdFinalFrame, { once: true });
-          visual.src = "assets/preload-final.webp";
-          return;
-        }
+      const startSequence = () => {
+        const beginPlaybackClock = () => {
+          clearTimeout(sequenceTimer);
+          sequenceTimer = window.setTimeout(holdFinalFrame, sequenceDuration);
+        };
 
-        try {
-          const response = await fetch("assets/preload-sequence-12fps.webp", {
-            cache: "force-cache"
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            poster.addEventListener("error", () => {
+              poster.src = "assets/preload-hold.webp?v=1";
+              holdFinalFrame();
+            }, { once: true });
+            poster.addEventListener("load", beginPlaybackClock, { once: true });
+            poster.src = `${animationSource}?play=${Date.now()}`;
           });
-          if (!response.ok) throw new Error("Preload animation unavailable");
-
-          sequenceObjectUrl = URL.createObjectURL(await response.blob());
-          visual.addEventListener("load", () => {
-            requestAnimationFrame(() => {
-              sequenceTimer = window.setTimeout(holdFinalFrame, sequenceDuration);
-            });
-          }, { once: true });
-          visual.src = sequenceObjectUrl;
-        } catch {
-          holdFinalFrame();
-        }
+        });
       };
 
-      visual.addEventListener("error", holdFinalFrame, { once: true });
       startSequence();
 
       document.addEventListener("keydown", (event) => {

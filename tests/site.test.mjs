@@ -4,6 +4,20 @@ import test from "node:test";
 
 const projectRoot = new URL("../", import.meta.url);
 const sourceHtml = await readFile(new URL("index.html", projectRoot), "utf8");
+const secondaryPages = await Promise.all(
+  ["about.html", "work.html", "contact.html"].map(async (file) => ({
+    file,
+    source: await readFile(new URL(file, projectRoot), "utf8"),
+  })),
+);
+const pagesCss = await readFile(
+  new URL("assets/css/portfolio-pages.css", projectRoot),
+  "utf8",
+);
+const pagesJs = await readFile(
+  new URL("assets/js/portfolio-pages.js", projectRoot),
+  "utf8",
+);
 const workerUrl = new URL("dist/server/index.js", projectRoot);
 workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
 const { default: worker } = await import(workerUrl.href);
@@ -93,18 +107,133 @@ test("keeps a fixed navigation geometry with the avatar leading the links", () =
   assert.doesNotMatch(sourceHtml, /<span class="brand-mark"/);
 });
 
-test("runs the 12 FPS preload, three-second hold, and upward reveal", () => {
+test("links the four-page navigation to the requested destinations", () => {
+  const allPages = [{ file: "index.html", source: sourceHtml }, ...secondaryPages];
+  for (const { file, source } of allPages) {
+    assert.match(
+      source,
+      /<a class="brand" href="index\.html"[^>]*>[\s\S]*?<img class="nav-avatar"/,
+      `${file} avatar should open index.html`,
+    );
+    assert.match(source, /<a href="index\.html"[^>]*>Trang chủ<\/a>/);
+    assert.match(source, /<a href="about\.html"[^>]*>Giới thiệu<\/a>/);
+    assert.match(source, /<a href="work\.html"[^>]*>Dự án<\/a>/);
+    assert.match(source, /<a class="nav-cta[^"]*" href="contact\.html"/);
+  }
+});
+
+test("uses the shared main-page visual system on all secondary pages", () => {
+  for (const { file, source } of secondaryPages) {
+    assert.match(source, /assets\/css\/portfolio-pages\.css/, `${file} shared CSS`);
+    assert.match(source, /class="nav-glass liquid-glass"/, `${file} glass navigation`);
+    assert.match(source, /class="footer-glass footer-shell liquid-glass"/, `${file} glass footer`);
+    assert.match(source, /assets\/js\/portfolio-pages\.js/, `${file} shared interactions`);
+
+    const ids = [...source.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
+    assert.equal(new Set(ids).size, ids.length, `${file} has duplicate IDs`);
+  }
+
+  assert.match(pagesCss, /--paper:\s*#f4f4f1/);
+  assert.match(pagesCss, /--ink:\s*#111111/);
+  assert.match(pagesCss, /font-family:\s*var\(--font\)/);
+  assert.match(pagesCss, /backdrop-filter:\s*blur\(24px\)/);
+  assert.match(pagesCss, /\.tilt-card/);
+  assert.match(pagesJs, /perspective\(900px\) translate3d/);
+  assert.match(pagesJs, /prefers-reduced-motion:\s*reduce/);
+});
+
+test("preserves project data and accessible contact behavior", () => {
+  const workPage = secondaryPages.find(({ file }) => file === "work.html").source;
+  const contactPage = secondaryPages.find(({ file }) => file === "contact.html").source;
+
+  assert.match(workPage, /17 dự án đã tham gia/);
+  assert.match(workPage, /assets\/js\/data\.js/);
+  assert.match(pagesJs, /window\.PORTFOLIO_DATA\?\.projects/);
+  assert.match(pagesJs, /aria-expanded/);
+
+  assert.match(contactPage, /tel:0326560268/);
+  assert.match(contactPage, /tel:0867893441/);
+  assert.match(contactPage, /mailto:thombeohau@gmail\.com/);
+  assert.match(contactPage, /id="contact-form"/);
+  assert.match(contactPage, /aria-live="polite"/);
+  assert.match(pagesJs, /mailto:thombeohau@gmail\.com/);
+});
+
+test("auto-expands project cards on hover with a smooth S-curve", () => {
+  assert.match(pagesJs, /card\.addEventListener\("pointerenter", \(\) => setCardOpen\(card, true\)\)/);
+  assert.match(pagesJs, /card\.addEventListener\("pointerleave", \(\) => setCardOpen\(card, false\)\)/);
+  assert.match(pagesJs, /setCardOpen\(card, !card\.classList\.contains\("is-open"\)\)/);
+  assert.match(pagesCss, /--s-curve:\s*cubic-bezier\(0\.65, 0, 0\.35, 1\)/);
+  assert.match(
+    pagesCss,
+    /\.project-details\s*\{[\s\S]*?transition:\s*grid-template-rows 760ms var\(--s-curve\)/,
+  );
+  assert.match(
+    pagesCss,
+    /\.project-card\.is-open \.project-details-content\s*\{[\s\S]*?opacity:\s*1;[\s\S]*?translateY\(0\)/,
+  );
+});
+
+test("runs the 12 FPS preload, one-second hold, and upward reveal once per session", () => {
   assert.match(sourceHtml, /id="site-preloader"/);
-  assert.match(sourceHtml, /assets\/preload-first\.webp/);
-  assert.match(sourceHtml, /assets\/preload-sequence-12fps\.webp/);
-  assert.match(sourceHtml, /assets\/preload-final\.webp/);
+  assert.match(sourceHtml, /assets\/preload-hold\.webp\?v=1/);
   assert.match(sourceHtml, /Hợp tác vận hành từ hôm nay/);
-  assert.match(sourceHtml, /const sequenceDuration = 7167/);
-  assert.match(sourceHtml, /const holdDuration = reduceMotion \? 900 : 3000/);
+  assert.match(sourceHtml, /const framesPerSecond = 12/);
+  assert.match(sourceHtml, /const sequenceDuration = 7166/);
+  assert.match(sourceHtml, /const holdDuration = 1000/);
+  assert.match(sourceHtml, /const animationSource = "assets\/preload-final\.webp"/);
+  assert.match(sourceHtml, /const storageKey = "portfolio-preloader-played"/);
+  assert.match(sourceHtml, /sessionStorage\.getItem\("portfolio-preloader-played"\) === "1"/);
+  assert.match(sourceHtml, /sessionStorage\.setItem\(storageKey, "1"\)/);
+  assert.match(sourceHtml, /\.preloader-seen \.site-preloader\s*\{[\s\S]*?display:\s*none/);
   assert.match(sourceHtml, /\.site-preloader\.is-exiting[\s\S]*?translate3d\(0, -105%, 0\)/);
+  assert.match(
+    sourceHtml,
+    /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.site-preloader\s*\{[\s\S]*?transition-duration:\s*1\.45s !important/,
+  );
+  assert.match(sourceHtml, /window\.setTimeout\(removePreloader, 1800\)/);
   assert.match(sourceHtml, /backdrop-filter:\s*blur\(28px\)/);
-  assert.match(sourceHtml, /await fetch\("assets\/preload-sequence-12fps\.webp"/);
-  assert.match(sourceHtml, /URL\.createObjectURL\(await response\.blob\(\)\)/);
+  assert.match(
+    sourceHtml,
+    /poster\.src = `\$\{animationSource\}\?play=\$\{Date\.now\(\)\}`/,
+  );
+  assert.match(sourceHtml, /requestAnimationFrame\(\(\) => \{[\s\S]*?requestAnimationFrame/);
+  assert.match(sourceHtml, /window\.setTimeout\(holdFinalFrame, sequenceDuration\)/);
+});
+
+test("applies interactive 3D hover cards throughout the about page", () => {
+  const aboutPage = secondaryPages.find(({ file }) => file === "about.html").source;
+  assert.match(aboutPage, /class="hero-note liquid-glass tilt-card"/);
+  assert.equal(
+    [...aboutPage.matchAll(/class="profile-panel liquid-glass tilt-card"/g)].length,
+    2,
+  );
+  assert.equal(
+    [...aboutPage.matchAll(/class="metric-card liquid-glass tilt-card"/g)].length,
+    3,
+  );
+  assert.equal(
+    [...aboutPage.matchAll(/class="feature-card liquid-glass tilt-card"/g)].length,
+    4,
+  );
+  assert.match(aboutPage, /class="cta-panel liquid-glass tilt-card"/);
+});
+
+test("uses the requested preload-final WebP as the 86-frame animation", async () => {
+  const animation = await readFile(
+    new URL("assets/preload-final.webp", projectRoot),
+  );
+  let offset = 12;
+  let frameCount = 0;
+
+  while (offset + 8 <= animation.length) {
+    const chunkType = animation.toString("ascii", offset, offset + 4);
+    const chunkSize = animation.readUInt32LE(offset + 4);
+    if (chunkType === "ANMF") frameCount += 1;
+    offset += 8 + chunkSize + (chunkSize % 2);
+  }
+
+  assert.equal(frameCount, 86);
 });
 
 test("uses pointer-responsive 3D card physics without affecting reduced motion", () => {
@@ -122,8 +251,25 @@ test("uses pointer-responsive 3D card physics without affecting reduced motion",
   assert.match(sourceHtml, /card\.style\.zIndex = "12"/);
 });
 
-test("returns a clear 404 for routes outside the single page", async () => {
-  const response = await worker.fetch(new Request("https://portfolio.test/about"));
+test("serves every portfolio page and shared page asset", async () => {
+  const routes = [
+    ["/about.html", "text/html; charset=utf-8"],
+    ["/work.html", "text/html; charset=utf-8"],
+    ["/contact.html", "text/html; charset=utf-8"],
+    ["/assets/css/portfolio-pages.css", "text/css; charset=utf-8"],
+    ["/assets/js/portfolio-pages.js", "text/javascript; charset=utf-8"],
+    ["/assets/js/data.js", "text/javascript; charset=utf-8"],
+  ];
+
+  for (const [route, type] of routes) {
+    const response = await worker.fetch(new Request(`https://portfolio.test${route}`));
+    assert.equal(response.status, 200, route);
+    assert.equal(response.headers.get("content-type"), type, route);
+  }
+});
+
+test("returns a clear 404 for unknown routes", async () => {
+  const response = await worker.fetch(new Request("https://portfolio.test/missing"));
   assert.equal(response.status, 404);
 });
 
@@ -137,25 +283,19 @@ test("serves the navigation avatar", async () => {
 });
 
 test("serves all WebP preload assets", async () => {
-  const [firstResponse, sequenceResponse, finalResponse] = await Promise.all([
-    worker.fetch(
-      new Request("https://portfolio.test/assets/preload-first.webp"),
-    ),
-    worker.fetch(
-      new Request("https://portfolio.test/assets/preload-sequence-12fps.webp"),
-    ),
+  const [finalResponse, holdResponse] = await Promise.all([
     worker.fetch(
       new Request("https://portfolio.test/assets/preload-final.webp"),
     ),
+    worker.fetch(
+      new Request("https://portfolio.test/assets/preload-hold.webp"),
+    ),
   ]);
 
-  assert.equal(firstResponse.status, 200);
-  assert.equal(sequenceResponse.status, 200);
   assert.equal(finalResponse.status, 200);
-  assert.equal(firstResponse.headers.get("content-type"), "image/webp");
-  assert.equal(sequenceResponse.headers.get("content-type"), "image/webp");
+  assert.equal(holdResponse.status, 200);
   assert.equal(finalResponse.headers.get("content-type"), "image/webp");
-  assert.ok((await firstResponse.arrayBuffer()).byteLength > 10_000);
-  assert.ok((await sequenceResponse.arrayBuffer()).byteLength > 1_000_000);
-  assert.ok((await finalResponse.arrayBuffer()).byteLength > 20_000);
+  assert.equal(holdResponse.headers.get("content-type"), "image/webp");
+  assert.ok((await finalResponse.arrayBuffer()).byteLength > 1_000_000);
+  assert.ok((await holdResponse.arrayBuffer()).byteLength > 20_000);
 });
